@@ -10,8 +10,8 @@ jobs:
       - node/with-cache:
           steps:
             - run: npm install
-            - run: npm ng build --prod
-            - run: npm ng test --watch=false
+            - run: npm run build:prod
+            - run: npm run test:nowatch
 workflows:
     build-and-test:
       jobs:
