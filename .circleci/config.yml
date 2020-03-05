@@ -6,12 +6,26 @@ jobs:
       - image: circleci/node:10-browsers
     steps:
       - checkout
+      - setup_remote_docker
+
       - restore_cache:
           key: my-project-{{ .Branch }}-{{ checksum "package-lock.json" }}
       - run: npm install
-      - run: npm run build:prod
+
       - save_cache:
           key: my-project-{{ .Branch }}-{{ checksum "package-lock.json" }}
           paths:
             - "node_modules"
+
+      - run: npm run build:prod
       - run: npm run test -- --no-watch --no-progress --browsers=ChromeHeadlessCI
+
+      - run:
+          command: |
+            docker build -t simpbp.azurecr.io/hello:1.0 .
+      - run:
+          command: |
+            docker login --username $DOCKER_USER --password $DOCKER_PASS simpbp.azurecr.io
+      - run:
+          command: |
+            docker push simpbp.azurecr.io/hello:1.0
